@@ -1,22 +1,16 @@
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
 import org.testng.annotations.*;
 import pages.MainPage;
 import pages.FlightSearchPage;
 
 import static org.testng.Assert.assertTrue;
 
-public class SameCitySearchTest {
-    private WebDriver driver;
+public class SameCitySearchTest extends BaseTest {
     private MainPage mainPage;
     private FlightSearchPage flightSearchPage;
 
     @BeforeClass
-    public void setup() {
-        driver = new ChromeDriver();
-        driver.manage().window().maximize();
-        driver.get("https://uzairways.com/en");
-
+    public void initPages() {
+        driver.get(BASE_URL);
         mainPage = new MainPage(driver);
         flightSearchPage = new FlightSearchPage(driver);
     }
@@ -25,19 +19,14 @@ public class SameCitySearchTest {
     public void testSameCitySearchError() {
         mainPage.acceptCookiesIfPresent();
 
-        flightSearchPage.selectFromCity("Tashkent");
-        flightSearchPage.selectToCity("Tashkent");
-        flightSearchPage.selectDepartureDate("10");
+        flightSearchPage.selectDepartureCity("Tashkent");
+        flightSearchPage.selectArrivalCity("Tashkent");
+        flightSearchPage.selectDepartureDate("10", "July 2025");
         flightSearchPage.selectCurrency("USD");
         flightSearchPage.clickSearch();
 
-        String currentUrl = driver.getCurrentUrl();
-        assertTrue(currentUrl.contains("booking") || currentUrl.contains("flights") || currentUrl.contains("search"),
-                "Expected redirect to booking system.");
-    }
-
-    @AfterClass
-    public void tearDown() {
-        if (driver != null) driver.quit();
+        String pageSource = driver.getPageSource().toLowerCase();
+        assertTrue(pageSource.contains("departure and arrival cities must be different"),
+                "Expected error message for same departure and arrival cities.");
     }
 }

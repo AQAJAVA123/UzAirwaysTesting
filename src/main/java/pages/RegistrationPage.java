@@ -4,62 +4,55 @@ import org.openqa.selenium.*;
 import org.openqa.selenium.support.*;
 import org.openqa.selenium.support.ui.*;
 
-import java.time.Duration;
-
-public class RegistrationPage {
-    WebDriver driver;
-    WebDriverWait wait;
+public class RegistrationPage extends BasePage {
 
     @FindBy(name = "email")
-    WebElement emailField;
+    private WebElement emailInput;
 
     @FindBy(name = "first_name")
-    WebElement firstNameField;
+    private WebElement firstNameInput;
 
     @FindBy(name = "last_name")
-    WebElement lastNameField;
+    private WebElement lastNameInput;
 
     @FindBy(name = "date")
-    WebElement birthDateField;
+    private WebElement birthDateInput;
 
     @FindBy(name = "password")
-    WebElement passwordField;
+    private WebElement passwordInput;
 
     @FindBy(name = "password_confirmation")
-    WebElement confirmPasswordField;
+    private WebElement confirmPasswordInput;
 
     @FindBy(css = "button[type='submit']")
-    WebElement registerButton;
+    private WebElement registerButton;
 
     public RegistrationPage(WebDriver driver) {
-        this.driver = driver;
-        this.wait = new WebDriverWait(driver, Duration.ofSeconds(15));
-        PageFactory.initElements(driver, this);
+        super(driver);
     }
 
     public void enterEmail(String email) {
-        emailField.sendKeys(email);
+        emailInput.sendKeys(email);
     }
 
     public void enterFirstName(String firstName) {
-        wait.until(ExpectedConditions.visibilityOf(firstNameField)).sendKeys(firstName);
+        wait.until(ExpectedConditions.visibilityOf(firstNameInput)).sendKeys(firstName);
     }
 
     public void enterLastName(String lastName) {
-        lastNameField.sendKeys(lastName);
+        lastNameInput.sendKeys(lastName);
     }
 
     public void enterBirthDate(String birthDate) {
-        wait.until(ExpectedConditions.visibilityOf(birthDateField)).clear();
-        birthDateField.sendKeys(birthDate);
+        birthDateInput.sendKeys(birthDate);
     }
 
     public void enterPassword(String password) {
-        passwordField.sendKeys(password);
+        passwordInput.sendKeys(password);
     }
 
     public void confirmPassword(String password) {
-        confirmPasswordField.sendKeys(password);
+        confirmPasswordInput.sendKeys(password);
     }
 
     public void clickRegister() {

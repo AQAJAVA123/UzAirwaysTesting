@@ -7,9 +7,7 @@ import org.openqa.selenium.support.ui.*;
 import java.time.Duration;
 import java.util.List;
 
-public class FlightSearchPage {
-    private WebDriver driver;
-    private WebDriverWait wait;
+public class FlightSearchPage extends BasePage {
 
     @FindBy(css = "button[data-id='tablofrom']")
     private WebElement fromButton;
@@ -30,9 +28,7 @@ public class FlightSearchPage {
     private WebElement toggleLabel;
 
     public FlightSearchPage(WebDriver driver) {
-        this.driver = driver;
-        this.wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-        PageFactory.initElements(driver, this);
+        super(driver);
     }
 
     public void enableRoundTripIfDisabled() {
@@ -50,7 +46,7 @@ public class FlightSearchPage {
         }
     }
 
-    public void selectFromCity(String cityName) {
+    public void selectDepartureCity(String cityName) {
         fromButton.click();
         wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("ul.dropdown-menu.inner.show")));
         WebElement city = wait.until(ExpectedConditions.elementToBeClickable(
@@ -59,42 +55,40 @@ public class FlightSearchPage {
         city.click();
     }
 
-    public void selectToCity(String cityName) {
+    public void selectArrivalCity(String cityName) {
         wait.until(ExpectedConditions.elementToBeClickable(toButton)).click();
         try {
             WebElement searchBox = wait.until(ExpectedConditions.presenceOfElementLocated(
                     By.cssSelector("div.dropdown-menu.show input.form-control")));
             searchBox.clear();
             searchBox.sendKeys(cityName);
-            Thread.sleep(1000);
             searchBox.sendKeys(Keys.ENTER);
         } catch (TimeoutException e) {
             WebElement city = wait.until(ExpectedConditions.elementToBeClickable(
                     By.xpath("//ul[contains(@class,'dropdown-menu')]//span[contains(text(), '" + cityName + "')]")));
             scrollIntoView(city);
             city.click();
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
         }
     }
 
-    public void selectDepartureDate(String day) {
+    public void selectDepartureDate(String day, String targetMonth) {
         ((JavascriptExecutor) driver).executeScript("arguments[0].click();", departureInput);
 
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".drp-calendar")));
 
-        while (!isTargetMonthVisible("July 2025")) {
-            List<WebElement> nextButtons = driver.findElements(By.cssSelector(".next.available"));
-            if (nextButtons.isEmpty()) {
-                throw new NoSuchElementException("No .next.available button found — cannot navigate to July 2025");
+        while (!isTargetMonthVisible(targetMonth)) {
+            try {
+                WebElement nextButton = driver.findElement(By.cssSelector(".drp-calendar.left .next.available"));
+                nextButton.click();
+            } catch (NoSuchElementException e) {
+                throw new NoSuchElementException("No 'Next' button found in the departure calendar — cannot navigate to " + targetMonth);
             }
-            nextButtons.get(0).click();
             waitForCalendarUpdate();
         }
 
-        WebElement correctCalendar = getCalendarForMonth("July 2025");
+        WebElement correctCalendar = getCalendarForMonth(targetMonth);
         WebElement dateCell = correctCalendar.findElement(
-                By.xpath(".//td[not(contains(@class, 'off')) and normalize-space(text())='" + Integer.parseInt(day) + "']")
+                By.xpath(".//td[not(contains(@class, 'off')) and normalize-space(text())='" + day + "']")
         );
         scrollIntoView(dateCell);
         dateCell.click();
@@ -201,11 +195,9 @@ public class FlightSearchPage {
     }
 
     private void waitForCalendarUpdate() {
-        try {
-            Thread.sleep(500);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
+        wait.until(ExpectedConditions.invisibilityOfElementLocated(
+                By.cssSelector(".drp-calendar.left .loading")
+        ));
     }
 
     private WebElement getReturnInput() {
@@ -217,7 +209,4 @@ public class FlightSearchPage {
         wait.until(ExpectedConditions.elementToBeClickable(searchButton)).click();
     }
 
-    private void scrollIntoView(WebElement element) {
-        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", element);
-    }
 }

@@ -23,7 +23,5 @@ The test classes simulate user interactions with various parts of the UzAirways 
 You should have the following prerequisites installed and configured on your system before running the tests:
 - Java (version 11 or higher)
 - Maven
-- Google Chrome browser
-- ChromeDriver matching your Chrome version
 
 To run the tests, use the command: **mvn clean test** or by right-clicking a test class → **Run**

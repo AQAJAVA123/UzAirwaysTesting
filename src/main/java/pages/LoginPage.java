@@ -6,23 +6,19 @@ import org.openqa.selenium.support.ui.*;
 
 import java.time.Duration;
 
-public class LoginPage {
-    WebDriver driver;
-    WebDriverWait wait;
+public class LoginPage extends BasePage {
 
     @FindBy(name = "email")
-    WebElement emailField;
+    private WebElement emailField;
 
     @FindBy(name = "password")
-    WebElement passwordField;
+    private WebElement passwordField;
 
     @FindBy(css = "button[type='submit']")
-    WebElement loginButton;
+    private WebElement loginButton;
 
     public LoginPage(WebDriver driver) {
-        this.driver = driver;
-        this.wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-        PageFactory.initElements(driver, this);
+        super(driver);
     }
 
     public void enterEmail(String email) {
@@ -37,6 +33,17 @@ public class LoginPage {
 
     public boolean isLoginButtonVisible() {
         return loginButton.isDisplayed();
+    }
+
+    public boolean isLoginErrorVisible() {
+        try {
+            WebDriverWait toastWait = new WebDriverWait(driver, Duration.ofSeconds(5));
+            WebElement errorToast = toastWait.until(ExpectedConditions.visibilityOfElementLocated(
+                    By.cssSelector("div[role='alert'].Vue-Toastification__toast-body")));
+            return errorToast.getText().toLowerCase().contains("wrong credentials");
+        } catch (TimeoutException e) {
+            return false;
+        }
     }
 
     public void clickLogin() {
