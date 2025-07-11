@@ -9,6 +9,7 @@ import java.util.List;
 
 public class FlightSearchPage extends BasePage {
 
+    // Static elements
     @FindBy(css = "button[data-id='tablofrom']")
     private WebElement fromButton;
 
@@ -27,6 +28,32 @@ public class FlightSearchPage extends BasePage {
     @FindBy(css = "label.input-toggler")
     private WebElement toggleLabel;
 
+    // Dynamic locators
+    private static final By CITY_DROPDOWN_LIST = By.cssSelector("ul.dropdown-menu.inner.show");
+    private static final String CITY_DROPDOWN_ITEM = "//ul[contains(@class,'dropdown-menu')]//span[contains(text(), '%s')]";
+    private static final By ARRIVAL_SEARCH_BOX = By.cssSelector("div.dropdown-menu.show input.form-control");
+    private static final By RETURN_INPUT_SELECTOR = By.cssSelector("input[data-note='Выберите дату обратно']");
+    private static final By CALENDAR_CONTAINER = By.cssSelector(".drp-calendar");
+    private static final By CALENDAR_CONTAINER_LEFT = By.cssSelector(".drp-calendar.left");
+    private static final By CALENDAR_CONTAINER_RIGHT = By.cssSelector(".drp-calendar.right");
+    private static final By CALENDAR_HEADER = By.cssSelector("th.month");
+    private static final String CALENDAR_DATE_CELL = ".//td[not(contains(@class, 'off')) and normalize-space(text())='%s']";
+    private static final By NEXT_BUTTON_LEFT = By.cssSelector(".drp-calendar.left .next.available");
+    private static final By NEXT_BUTTON_RIGHT = By.cssSelector(".drp-calendar.right .next.available");
+    private static final By CALENDAR_LOADING = By.cssSelector(".drp-calendar.left .loading");
+    private static final By PASSENGERS_BUTTON = By.cssSelector("div.passengers__text");
+    private static final By PASSENGER_POPOVER = By.cssSelector("div.passengers__popover.passengers__popover--active");
+    private static final By APPLY_PASSENGERS_BUTTON = By.cssSelector("div.passengers__popover--active .choosePassengers");
+    private static final By CURRENCY_DROPDOWN = By.cssSelector("span.currency-selected");
+    private static final By DROPDOWN_MENU = By.cssSelector("div.dropdown-menu.show");
+    private static final String CURRENCY_OPTION = "//span[@class='only-code' and text()='%s']";
+    private static final By ADULT_INPUT = By.id("inputadult");
+    private static final By ADULT_PLUS_BUTTON = By.cssSelector("#inputadult ~ button.quantity__plus");
+    private static final By CHILD_INPUT = By.id("inputchild");
+    private static final By CHILD_PLUS_BUTTON = By.cssSelector("#inputchild ~ button.quantity__plus");
+    private static final By BABY_INPUT = By.id("inputbaby");
+    private static final By BABY_PLUS_BUTTON = By.cssSelector("#inputbaby ~ button.quantity__plus");
+
     public FlightSearchPage(WebDriver driver) {
         super(driver);
     }
@@ -37,7 +64,7 @@ public class FlightSearchPage extends BasePage {
             toggleLabel.click();
             wait.until(d -> {
                 try {
-                    WebElement returnInput = d.findElement(By.cssSelector("input[data-note]"));
+                    WebElement returnInput = d.findElement(RETURN_INPUT_SELECTOR);
                     return returnInput.isDisplayed();
                 } catch (Exception e) {
                     return false;
@@ -48,9 +75,9 @@ public class FlightSearchPage extends BasePage {
 
     public void selectDepartureCity(String cityName) {
         fromButton.click();
-        wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector("ul.dropdown-menu.inner.show")));
+        wait.until(ExpectedConditions.presenceOfElementLocated(CITY_DROPDOWN_LIST));
         WebElement city = wait.until(ExpectedConditions.elementToBeClickable(
-                By.xpath("//ul[contains(@class,'dropdown-menu')]//span[contains(text(), '" + cityName + "')]")));
+                By.xpath(String.format(CITY_DROPDOWN_ITEM, cityName))));
         scrollIntoView(city);
         city.click();
     }
@@ -58,27 +85,26 @@ public class FlightSearchPage extends BasePage {
     public void selectArrivalCity(String cityName) {
         wait.until(ExpectedConditions.elementToBeClickable(toButton)).click();
         try {
-            WebElement searchBox = wait.until(ExpectedConditions.presenceOfElementLocated(
-                    By.cssSelector("div.dropdown-menu.show input.form-control")));
+            WebElement searchBox = wait.until(ExpectedConditions.presenceOfElementLocated(ARRIVAL_SEARCH_BOX));
             searchBox.clear();
             searchBox.sendKeys(cityName);
             searchBox.sendKeys(Keys.ENTER);
         } catch (TimeoutException e) {
             WebElement city = wait.until(ExpectedConditions.elementToBeClickable(
-                    By.xpath("//ul[contains(@class,'dropdown-menu')]//span[contains(text(), '" + cityName + "')]")));
+                    By.xpath(String.format(CITY_DROPDOWN_ITEM, cityName))));
             scrollIntoView(city);
             city.click();
         }
     }
 
     public void selectDepartureDate(String day, String targetMonth) {
-        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", departureInput);
+        jsClick(departureInput);
 
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".drp-calendar")));
+        wait.until(ExpectedConditions.visibilityOfElementLocated(CALENDAR_CONTAINER));
 
         while (!isTargetMonthVisible(targetMonth)) {
             try {
-                WebElement nextButton = driver.findElement(By.cssSelector(".drp-calendar.left .next.available"));
+                WebElement nextButton = wait.until(ExpectedConditions.elementToBeClickable(NEXT_BUTTON_LEFT));
                 nextButton.click();
             } catch (NoSuchElementException e) {
                 throw new NoSuchElementException("No 'Next' button found in the departure calendar — cannot navigate to " + targetMonth);
@@ -88,7 +114,7 @@ public class FlightSearchPage extends BasePage {
 
         WebElement correctCalendar = getCalendarForMonth(targetMonth);
         WebElement dateCell = correctCalendar.findElement(
-                By.xpath(".//td[not(contains(@class, 'off')) and normalize-space(text())='" + day + "']")
+                By.xpath(String.format(CALENDAR_DATE_CELL, day))
         );
         scrollIntoView(dateCell);
         dateCell.click();
@@ -96,30 +122,30 @@ public class FlightSearchPage extends BasePage {
 
     public void selectReturnDate(String day) {
         WebElement returnInput = getReturnInput();
-        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", returnInput);
+        jsClick(returnInput);
 
         WebElement calendar = wait.until(ExpectedConditions.visibilityOfElementLocated(
-                By.cssSelector(".drp-calendar.right")));
+                CALENDAR_CONTAINER_RIGHT));
 
         WebElement dateCell = calendar.findElement(
-                By.xpath(".//td[not(contains(@class, 'off')) and normalize-space(text())='" + Integer.parseInt(day) + "']"));
+                By.xpath(String.format(CALENDAR_DATE_CELL, day)));
         scrollIntoView(dateCell);
         dateCell.click();
     }
 
     public void selectPassengers(int adults, int children, int babies) {
         WebElement passengersButton = wait.until(ExpectedConditions.elementToBeClickable(
-                By.cssSelector("div.passengers__text")));
+                PASSENGERS_BUTTON));
         scrollIntoView(passengersButton);
-        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", passengersButton);
+        jsClick(passengersButton);
 
         wait.until(ExpectedConditions.visibilityOfElementLocated(
-                By.cssSelector("div.passengers__popover.passengers__popover--active")));
+                PASSENGER_POPOVER));
 
         // Adults
-        if (adults > 1) {
-            WebElement adultInput = driver.findElement(By.id("inputadult"));
-            WebElement adultPlus = driver.findElement(By.cssSelector("#inputadult ~ button.quantity__plus"));
+        if (adults >= 1) {
+            WebElement adultInput = driver.findElement(ADULT_INPUT);
+            WebElement adultPlus = driver.findElement((ADULT_PLUS_BUTTON));
             int current = Integer.parseInt(adultInput.getAttribute("value"));
             while (current < adults) {
                 adultPlus.click();
@@ -129,8 +155,8 @@ public class FlightSearchPage extends BasePage {
 
         // Children
         if (children > 0) {
-            WebElement childInput = driver.findElement(By.id("inputchild"));
-            WebElement childPlus = driver.findElement(By.cssSelector("#inputchild ~ button.quantity__plus"));
+            WebElement childInput = driver.findElement(CHILD_INPUT);
+            WebElement childPlus = driver.findElement((CHILD_PLUS_BUTTON));
             int current = Integer.parseInt(childInput.getAttribute("value"));
             while (current < children) {
                 childPlus.click();
@@ -140,8 +166,8 @@ public class FlightSearchPage extends BasePage {
 
         // Babies
         if (babies > 0) {
-            WebElement babyInput = driver.findElement(By.id("inputbaby"));
-            WebElement babyPlus = driver.findElement(By.cssSelector("#inputbaby ~ button.quantity__plus"));
+            WebElement babyInput = driver.findElement(BABY_INPUT);
+            WebElement babyPlus = driver.findElement(BABY_PLUS_BUTTON);
             int current = Integer.parseInt(babyInput.getAttribute("value"));
             while (current < babies) {
                 babyPlus.click();
@@ -150,32 +176,28 @@ public class FlightSearchPage extends BasePage {
         }
 
         WebElement applyButton = wait.until(ExpectedConditions.elementToBeClickable(
-                By.cssSelector("div.passengers__popover--active .choosePassengers")));
+                APPLY_PASSENGERS_BUTTON));
         applyButton.click();
 
         System.out.printf("Passengers selected — Adults: %d, Children: %d, Babies: %d%n", adults, children, babies);
     }
 
     public void selectCurrency(String currencyCode) {
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-
         WebElement currencyDropdown = wait.until(ExpectedConditions.elementToBeClickable(
-                By.cssSelector("span.currency-selected")));
-        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", currencyDropdown);
+                CURRENCY_DROPDOWN));
+        jsClick(currencyDropdown);
 
         wait.until(ExpectedConditions.visibilityOfElementLocated(
-                By.cssSelector("div.dropdown-menu.show")));
+                DROPDOWN_MENU));
 
-        String xpath = String.format("//span[@class='only-code' and text()='%s']", currencyCode);
-        WebElement currencyOption = wait.until(ExpectedConditions.elementToBeClickable(By.xpath(xpath)));
+        WebElement currencyOption = wait.until(ExpectedConditions.elementToBeClickable(By.xpath(String.format(CURRENCY_OPTION, currencyCode))));
         currencyOption.click();
     }
 
     private boolean isTargetMonthVisible(String targetMonth) {
-        List<WebElement> headers = driver.findElements(By.cssSelector("th.month"));
+        List<WebElement> headers = driver.findElements(CALENDAR_HEADER);
         for (WebElement header : headers) {
-            if (header.getText().toLowerCase().contains(targetMonth.toLowerCase()) ||
-                    header.getText().toLowerCase().contains("июль 2025")) {
+            if (header.getText().toLowerCase().contains(targetMonth.toLowerCase())) {
                 return true;
             }
         }
@@ -183,11 +205,10 @@ public class FlightSearchPage extends BasePage {
     }
 
     private WebElement getCalendarForMonth(String targetMonth) {
-        List<WebElement> calendars = driver.findElements(By.cssSelector(".drp-calendar"));
+        List<WebElement> calendars = driver.findElements(CALENDAR_CONTAINER);
         for (WebElement calendar : calendars) {
-            WebElement header = calendar.findElement(By.cssSelector("th.month"));
-            if (header.getText().toLowerCase().contains(targetMonth.toLowerCase()) ||
-                    header.getText().toLowerCase().contains("июль 2025")) {
+            WebElement header = calendar.findElement(CALENDAR_HEADER);
+            if (header.getText().toLowerCase().contains(targetMonth.toLowerCase())) {
                 return calendar;
             }
         }
@@ -196,13 +217,12 @@ public class FlightSearchPage extends BasePage {
 
     private void waitForCalendarUpdate() {
         wait.until(ExpectedConditions.invisibilityOfElementLocated(
-                By.cssSelector(".drp-calendar.left .loading")
-        ));
+                CALENDAR_LOADING));
     }
 
     private WebElement getReturnInput() {
         return wait.until(ExpectedConditions.presenceOfElementLocated(
-                By.cssSelector("input[data-note='Выберите дату обратно']")));
+                RETURN_INPUT_SELECTOR));
     }
 
     public void clickSearch() {

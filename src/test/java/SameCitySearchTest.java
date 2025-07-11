@@ -8,6 +8,11 @@ public class SameCitySearchTest extends BaseTest {
     private MainPage mainPage;
     private FlightSearchPage flightSearchPage;
 
+    private final String cityName = "Tashkent";
+    private final String departureDay = "10";
+    private final String departureMonth = "August 2025";
+    private final String currency = "USD";
+
     @BeforeClass
     public void initPages() {
         driver.get(BASE_URL);
@@ -19,10 +24,10 @@ public class SameCitySearchTest extends BaseTest {
     public void testSameCitySearchError() {
         mainPage.acceptCookiesIfPresent();
 
-        flightSearchPage.selectDepartureCity("Tashkent");
-        flightSearchPage.selectArrivalCity("Tashkent");
-        flightSearchPage.selectDepartureDate("10", "July 2025");
-        flightSearchPage.selectCurrency("USD");
+        flightSearchPage.selectDepartureCity(cityName);
+        flightSearchPage.selectArrivalCity(cityName);
+        flightSearchPage.selectDepartureDate(departureDay, departureMonth);
+        flightSearchPage.selectCurrency(currency);
         flightSearchPage.clickSearch();
 
         String pageSource = driver.getPageSource().toLowerCase();

@@ -20,10 +20,10 @@ public class LoginTest extends BaseTest{
         loginPage.enterEmail(testEmail);
         loginPage.enterPassword(testPassword);
 
-        assertTrue(loginPage.isLoginButtonVisible(), "Login button should be visible.");
+        assertTrue(loginPage.isLoginButtonVisible(), "Login button is not visible.");
         loginPage.clickLogin();
 
-        assertTrue(loginPage.isLoginErrorVisible(), "Expected 'Wrong credentials' toast to appear.");
+        assertTrue(loginPage.isLoginErrorVisible(), "Expected toast hasn't appeared.");
     }
 
 }

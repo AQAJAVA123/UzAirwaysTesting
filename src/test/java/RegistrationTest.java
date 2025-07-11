@@ -5,19 +5,19 @@ import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
 public class RegistrationTest extends BaseTest {
-    RegistrationPage registrationPage;
+    private RegistrationPage registrationPage;
+
+    private final String testEmail = "testuser@example.com";
+    private final String firstName = "Abc";
+    private final String lastName = "Smith";
+    private final String birthDate = "01.01.2000";
+    private final String password = "Password123";
 
     @BeforeClass
     public void setup() {
         driver.get(AUTH_URL + "/auth/register");
         registrationPage = new RegistrationPage(driver);
     }
-
-    String testEmail = "testuser@example.com";
-    String firstName = "Abc";
-    String lastName = "Smith";
-    String birthDate = "01.01.2000";
-    String password = "Password123";
 
     @Test
     public void testUserRegistration() {
@@ -32,7 +32,7 @@ public class RegistrationTest extends BaseTest {
         registrationPage.clickRegister();
 
         boolean isCaptchaVisible = driver.getPageSource().toLowerCase().contains("captcha");
-        assertFalse(isCaptchaVisible, "CAPTCHA is a bug");
+        assertFalse(isCaptchaVisible, "[BUG]: CAPTCHA is present");
 
         assertTrue(driver.getCurrentUrl().contains("success"), "Registration did not redirect to success page.");
     }

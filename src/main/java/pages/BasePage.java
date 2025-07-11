@@ -19,4 +19,16 @@ public abstract class BasePage {
     protected void scrollIntoView(WebElement element) {
         ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", element);
     }
+
+    protected boolean isElementVisible(WebElement element) {
+        try {
+            return element.isDisplayed();
+        } catch (NoSuchElementException | StaleElementReferenceException e) {
+            return false;
+        }
+    }
+
+    public void jsClick(WebElement element) {
+        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", element);
+    }
 }

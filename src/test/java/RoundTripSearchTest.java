@@ -8,6 +8,16 @@ public class RoundTripSearchTest extends BaseTest {
     private MainPage mainPage;
     private FlightSearchPage flightSearchPage;
 
+    private final String departureCity = "Tashkent";
+    private final String arrivalCity = "Istanbul";
+    private final String departureDay = "10";
+    private final String departureMonth = "August 2025";
+    private final String returnDay = "20";
+    private final int adults = 1;
+    private final int children = 0;
+    private final int babies = 0;
+    private final String currency = "USD";
+
     @BeforeClass
     public void initPages() {
         driver.get(BASE_URL);
@@ -20,12 +30,12 @@ public class RoundTripSearchTest extends BaseTest {
         mainPage.acceptCookiesIfPresent();
 
         flightSearchPage.enableRoundTripIfDisabled();
-        flightSearchPage.selectDepartureCity("Tashkent");
-        flightSearchPage.selectArrivalCity("Istanbul");
-        flightSearchPage.selectDepartureDate("10", "July 2025");
-        flightSearchPage.selectReturnDate("20");
-        flightSearchPage.selectPassengers(1, 0, 0);
-        flightSearchPage.selectCurrency("USD");
+        flightSearchPage.selectDepartureCity(departureCity);
+        flightSearchPage.selectArrivalCity(arrivalCity);
+        flightSearchPage.selectDepartureDate(departureDay, departureMonth);
+        flightSearchPage.selectReturnDate(returnDay);
+        flightSearchPage.selectPassengers(adults, children, babies);
+        flightSearchPage.selectCurrency(currency);
         flightSearchPage.clickSearch();
 
         String currentUrl = driver.getCurrentUrl();

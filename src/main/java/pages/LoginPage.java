@@ -17,6 +17,8 @@ public class LoginPage extends BasePage {
     @FindBy(css = "button[type='submit']")
     private WebElement loginButton;
 
+    private static final By LOGIN_ERROR_TOAST = By.cssSelector("div[role='alert'].Vue-Toastification__toast-body");
+
     public LoginPage(WebDriver driver) {
         super(driver);
     }
@@ -32,14 +34,14 @@ public class LoginPage extends BasePage {
     }
 
     public boolean isLoginButtonVisible() {
-        return loginButton.isDisplayed();
+        return isElementVisible(loginButton);
     }
 
     public boolean isLoginErrorVisible() {
         try {
             WebDriverWait toastWait = new WebDriverWait(driver, Duration.ofSeconds(5));
             WebElement errorToast = toastWait.until(ExpectedConditions.visibilityOfElementLocated(
-                    By.cssSelector("div[role='alert'].Vue-Toastification__toast-body")));
+                    LOGIN_ERROR_TOAST));
             return errorToast.getText().toLowerCase().contains("wrong credentials");
         } catch (TimeoutException e) {
             return false;
@@ -50,5 +52,3 @@ public class LoginPage extends BasePage {
         loginButton.click();
     }
 }
-
-
