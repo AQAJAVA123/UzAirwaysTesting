@@ -25,5 +25,4 @@ public class LoginTest extends BaseTest{
 
         assertTrue(loginPage.isLoginErrorVisible(), "Expected toast hasn't appeared.");
     }
-
 }
