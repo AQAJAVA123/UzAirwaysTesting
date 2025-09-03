@@ -1,4 +1,4 @@
-package pages;
+package main.java.pages;
 
 import org.openqa.selenium.*;
 import org.openqa.selenium.support.*;
@@ -32,30 +32,30 @@ public class RegistrationPage extends BasePage {
     }
 
     public void enterEmail(String email) {
-        emailInput.sendKeys(email);
+        waitUntilVisible(emailInput).sendKeys(email);
     }
 
     public void enterFirstName(String firstName) {
-        wait.until(ExpectedConditions.visibilityOf(firstNameInput)).sendKeys(firstName);
+        waitUntilVisible(firstNameInput).sendKeys(firstName);
     }
 
     public void enterLastName(String lastName) {
-        lastNameInput.sendKeys(lastName);
+        waitUntilVisible(lastNameInput).sendKeys(lastName);
     }
 
     public void enterBirthDate(String birthDate) {
-        birthDateInput.sendKeys(birthDate);
+        waitUntilVisible(birthDateInput).sendKeys(birthDate);
     }
 
     public void enterPassword(String password) {
-        passwordInput.sendKeys(password);
+        waitUntilVisible(passwordInput).sendKeys(password);
     }
 
     public void confirmPassword(String password) {
-        confirmPasswordInput.sendKeys(password);
+        waitUntilVisible(confirmPasswordInput).sendKeys(password);
     }
 
     public void clickRegister() {
-        registerButton.click();
+        waitUntilClickable(registerButton).click();
     }
 }

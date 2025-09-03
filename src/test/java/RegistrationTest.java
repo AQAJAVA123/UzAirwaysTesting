@@ -1,3 +1,5 @@
+package test;
+
 import org.testng.annotations.*;
 import pages.RegistrationPage;
 

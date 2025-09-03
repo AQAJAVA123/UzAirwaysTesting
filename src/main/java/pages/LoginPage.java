@@ -1,4 +1,4 @@
-package pages;
+package main.java.pages;
 
 import org.openqa.selenium.*;
 import org.openqa.selenium.support.*;
@@ -25,12 +25,12 @@ public class LoginPage extends BasePage {
     }
 
     public void enterEmail(String email) {
-        wait.until(ExpectedConditions.visibilityOf(emailField)).clear();
+        waitUntilVisible(emailField).clear();
         emailField.sendKeys(email);
     }
 
     public void enterPassword(String password) {
-        passwordField.clear();
+        waitUntilVisible(passwordField).clear();
         passwordField.sendKeys(password);
     }
 
@@ -40,15 +40,13 @@ public class LoginPage extends BasePage {
 
     public boolean isLoginErrorVisible() {
         try {
-            WebDriverWait toastWait = new WebDriverWait(driver, Duration.ofSeconds(5));
-            toastWait.until(ExpectedConditions.visibilityOf(loginErrorToast));
-            return loginErrorToast.getText().toLowerCase().contains("wrong credentials");
+            return waitUntilVisible(loginErrorToast).isDisplayed();
         } catch (TimeoutException e) {
             return false;
         }
     }
 
     public void clickLogin() {
-        loginButton.click();
+        waitUntilClickable(loginButton).click();
     }
 }

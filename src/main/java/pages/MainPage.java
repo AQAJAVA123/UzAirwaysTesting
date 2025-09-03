@@ -1,4 +1,4 @@
-package pages;
+package main.java.pages;
 
 import org.openqa.selenium.*;
 import org.openqa.selenium.support.*;
@@ -13,8 +13,8 @@ public class MainPage extends BasePage {
     }
 
     public void acceptCookiesIfPresent() {
-        if (acceptCookiesBtn.isDisplayed()) {
-            acceptCookiesBtn.click();
+        if (isElementVisible(acceptCookiesBtn)) {
+            waitUntilClickable(acceptCookiesBtn).click();
         }
     }
 }

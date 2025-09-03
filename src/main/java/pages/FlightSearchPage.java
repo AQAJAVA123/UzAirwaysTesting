@@ -1,4 +1,4 @@
-package pages;
+package main.java.pages;
 
 import org.openqa.selenium.*;
 import org.openqa.selenium.support.*;
@@ -36,7 +36,7 @@ public class FlightSearchPage extends BasePage {
     private WebElement calendarRight;
 
     @FindBy(css = "th.month")
-    private List<WebElement> calendarHeaders;
+    private List<WebElement> monthHeaders;
 
     @FindBy(css = ".drp-calendar.left .next.available")
     private WebElement nextButtonLeft;
@@ -80,130 +80,124 @@ public class FlightSearchPage extends BasePage {
     @FindBy(css = "#inputbaby ~ button.quantity__plus")
     private WebElement babyPlusButton;
 
+    @FindBy(css = "div.dropdown-menu.show input.form-control")
+    private WebElement arrivalSearchBox;
+
+    @FindBy(css = "ul.dropdown-menu.inner.show")
+    private WebElement cityDropdownList;
+
+    @FindBy(css = "input[data-note='Выберите дату обратно']")
+    private WebElement returnInput;
+
     private static final String CITY_DROPDOWN_ITEM = "//ul[contains(@class,'dropdown-menu')]//span[contains(text(), '%s')]";
     private static final String CALENDAR_DATE_CELL = ".//td[not(contains(@class, 'off')) and normalize-space(text())='%s']";
     private static final String CURRENCY_OPTION = "//span[@class='only-code' and text()='%s']";
-    private static final By ARRIVAL_SEARCH_BOX = By.cssSelector("div.dropdown-menu.show input.form-control");
-    private static final By CITY_DROPDOWN_LIST = By.cssSelector("ul.dropdown-menu.inner.show");
-    private static final By RETURN_INPUT_SELECTOR = By.cssSelector("input[data-note='Выберите дату обратно']");
 
     public FlightSearchPage(WebDriver driver) {
         super(driver);
     }
 
+    private By getCityDropdownItem(String city) {
+        return By.xpath(String.format(CITY_DROPDOWN_ITEM, city));
+    }
+
+    private By getCalendarDateCell(String day) {
+        return By.xpath(String.format(CALENDAR_DATE_CELL, day));
+    }
+
+    private By getCurrencyOption(String currency) {
+        return By.xpath(String.format(CURRENCY_OPTION, currency));
+    }
+
     public void enableRoundTripIfDisabled() {
-        wait.until(ExpectedConditions.elementToBeClickable(toggleLabel));
+        waitUntilClickable(toggleLabel);
         if (oneWayToggleCheckbox.isSelected()) {
             toggleLabel.click();
-            wait.until(d -> {
-                try {
-                    WebElement returnInput = d.findElement(RETURN_INPUT_SELECTOR);
-                    return returnInput.isDisplayed();
-                } catch (Exception e) {
-                    return false;
-                }
-            });
+            waitUntilReturnInputVisible();
         }
     }
 
     public void selectDepartureCity(String cityName) {
         fromButton.click();
-        wait.until(ExpectedConditions.presenceOfElementLocated(CITY_DROPDOWN_LIST));
-
-        By cityLocator = By.xpath(String.format(CITY_DROPDOWN_ITEM, cityName));
-        wait.until(ExpectedConditions.presenceOfElementLocated(cityLocator));
-        WebElement city = wait.until(ExpectedConditions.elementToBeClickable(cityLocator));
-
+        waitUntilVisible(cityDropdownList);
+        WebElement city = waitUntilClickable(getCityDropdownItem(cityName));
         scrollIntoView(city);
         city.click();
     }
 
     public void selectArrivalCity(String cityName) {
-        wait.until(ExpectedConditions.elementToBeClickable(toButton)).click();
+        waitUntilClickable(toButton).click();
         try {
             WebElement searchBox = wait.until(ExpectedConditions.presenceOfElementLocated(ARRIVAL_SEARCH_BOX));
             searchBox.clear();
             searchBox.sendKeys(cityName);
             searchBox.sendKeys(Keys.ENTER);
         } catch (TimeoutException e) {
-            WebElement city = wait.until(ExpectedConditions.elementToBeClickable(
-                    By.xpath(String.format(CITY_DROPDOWN_ITEM, cityName))));
+            WebElement city = waitUntilClickable(getCityDropdownItem(cityName));
             scrollIntoView(city);
             city.click();
         }
     }
 
-    public void selectDepartureDate(String day, String targetMonth) {
+    public boolean selectDepartureDate(String day, String targetMonth) {
         jsClick(departureInput);
-        wait.until(ExpectedConditions.visibilityOf(calendarLeft));
+        waitUntilVisible(calendarLeft);
 
         final int maxRetries = 12;
         for (int i = 0; i < maxRetries; i++) {
             if (isTargetMonthVisible(targetMonth)) {
-                break;
+                WebElement calendar = getCalendarForMonth(targetMonth);
+                WebElement dateCell = calendar.findElement(getCalendarDateCell(day));
+                scrollIntoView(dateCell);
+                dateCell.click();
+                return true;
             }
-            wait.until(ExpectedConditions.elementToBeClickable(nextButtonLeft)).click();
+            waitUntilClickable(nextButtonLeft).click();
             waitForCalendarUpdate();
         }
 
-        if (!isTargetMonthVisible(targetMonth)) {
-            throw new NoSuchElementException("Target month not visible after max retries: " + targetMonth);
-        }
-
-        WebElement correctCalendar = getCalendarForMonth(targetMonth);
-        WebElement dateCell = correctCalendar.findElement(By.xpath(String.format(CALENDAR_DATE_CELL, day)));
-        scrollIntoView(dateCell);
-        dateCell.click();
+        return false;
     }
 
     public void selectReturnDate(String day) {
-        WebElement returnInput = getReturnInput();
-        jsClick(returnInput);
-        wait.until(ExpectedConditions.visibilityOf(calendarRight));
-        WebElement dateCell = calendarRight.findElement(By.xpath(String.format(CALENDAR_DATE_CELL, day)));
+        jsClick(waitUntilReturnInputVisible());
+        waitUntilVisible(calendarRight);
+        WebElement dateCell = calendarRight.findElement(getCalendarDateCell(day));
         scrollIntoView(dateCell);
         dateCell.click();
     }
 
     public void selectPassengers(int adults, int children, int babies) {
-        wait.until(ExpectedConditions.elementToBeClickable(passengersButton));
+        waitUntilClickable(passengersButton);
         scrollIntoView(passengersButton);
         jsClick(passengersButton);
-        wait.until(ExpectedConditions.visibilityOf(passengerPopover));
+        waitUntilVisible(passengerPopover);
 
-        int currentAdults = Integer.parseInt(adultInput.getAttribute("value"));
-        while (currentAdults < adults) {
+        for (int i = getCurrentValue(adultInput); i < adults; i++) {
             adultPlusButton.click();
-            currentAdults++;
         }
 
-        int currentChildren = Integer.parseInt(childInput.getAttribute("value"));
-        while (currentChildren < children) {
+        for (int i = getCurrentValue(childInput); i < children; i++) {
             childPlusButton.click();
-            currentChildren++;
         }
 
-        int currentBabies = Integer.parseInt(babyInput.getAttribute("value"));
-        while (currentBabies < babies) {
+        for (int i = getCurrentValue(babyInput); i < babies; i++) {
             babyPlusButton.click();
-            currentBabies++;
         }
 
-        wait.until(ExpectedConditions.elementToBeClickable(applyPassengersButton)).click();
-        System.out.printf("Passengers selected — Adults: %d, Children: %d, Babies: %d%n", adults, children, babies);
+        waitUntilClickable(applyPassengersButton).click();
     }
 
     public void selectCurrency(String currencyCode) {
-        wait.until(ExpectedConditions.elementToBeClickable(currencyDropdown));
+        waitUntilClickable(currencyDropdown);
         jsClick(currencyDropdown);
-        wait.until(ExpectedConditions.visibilityOf(dropdownMenu));
-        WebElement currencyOption = wait.until(ExpectedConditions.elementToBeClickable(
-                By.xpath(String.format(CURRENCY_OPTION, currencyCode))));
-        currencyOption.click();
+        waitUntilVisible(dropdownMenu);
+        WebElement option = waitUntilClickable(getCurrencyOption(currencyCode));
+        option.click();
     }
 
     private boolean isTargetMonthVisible(String targetMonth) {
-        for (WebElement header : calendarHeaders) {
+        for (WebElement header : monthHeaders) {
             if (header.getText().toLowerCase().contains(targetMonth.toLowerCase())) {
                 return true;
             }
@@ -212,10 +206,9 @@ public class FlightSearchPage extends BasePage {
     }
 
     private WebElement getCalendarForMonth(String targetMonth) {
-        for (WebElement calendar : calendarContainers) {
-            WebElement header = calendar.findElement(By.cssSelector("th.month"));
-            if (header.getText().toLowerCase().contains(targetMonth.toLowerCase())) {
-                return calendar;
+        for (int i = 0; i < monthHeaders.size(); i++) {
+            if (monthHeaders.get(i).getText().toLowerCase().contains(targetMonth.toLowerCase())) {
+                return calendarContainers.get(i);
             }
         }
         throw new NoSuchElementException("No calendar found showing " + targetMonth);
@@ -225,8 +218,8 @@ public class FlightSearchPage extends BasePage {
         wait.until(ExpectedConditions.invisibilityOf(calendarLoading));
     }
 
-    private WebElement getReturnInput() {
-        return wait.until(ExpectedConditions.presenceOfElementLocated(RETURN_INPUT_SELECTOR));
+    private WebElement waitUntilReturnInputVisible() {
+        return waitUntilVisible(returnInput);
     }
 
     public void clickSearch() {
