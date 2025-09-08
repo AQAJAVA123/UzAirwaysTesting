@@ -38,6 +38,9 @@ public class FlightSearchPage extends BasePage {
     @FindBy(css = "th.month")
     private List<WebElement> monthHeaders;
 
+    @FindBy(css = "div.dropdown-menu.show input.form-control")
+    private WebElement arrivalSearchBox;
+
     @FindBy(css = ".drp-calendar.left .next.available")
     private WebElement nextButtonLeft;
 
@@ -128,7 +131,7 @@ public class FlightSearchPage extends BasePage {
     public void selectArrivalCity(String cityName) {
         waitUntilClickable(toButton).click();
         try {
-            WebElement searchBox = wait.until(ExpectedConditions.presenceOfElementLocated(ARRIVAL_SEARCH_BOX));
+            WebElement searchBox = wait.until(ExpectedConditions.visibilityOf(arrivalSearchBox));
             searchBox.clear();
             searchBox.sendKeys(cityName);
             searchBox.sendKeys(Keys.ENTER);
