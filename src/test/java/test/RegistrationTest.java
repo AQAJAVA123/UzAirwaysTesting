@@ -1,11 +1,14 @@
 package test;
 
+import io.qameta.allure.*;
 import org.testng.annotations.*;
 import pages.RegistrationPage;
 
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
+@Epic("User authorization")
+@Feature("Registration")
 public class RegistrationTest extends BaseTest {
     private RegistrationPage registrationPage;
 
@@ -15,13 +18,16 @@ public class RegistrationTest extends BaseTest {
     private final String birthDate = "01.01.2000";
     private final String password = "Password123";
 
-    @BeforeClass
+    @BeforeMethod
     public void setup() {
         driver.get(AUTH_URL + "/auth/register");
         registrationPage = new RegistrationPage(driver);
     }
 
     @Test
+    @Story("Valid registration scenario")
+    @Description("Verify that user can fill registration form and reach success page")
+    @Severity(SeverityLevel.CRITICAL)
     public void testUserRegistration() {
 
         registrationPage.enterEmail(testEmail);

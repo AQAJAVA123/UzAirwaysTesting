@@ -1,9 +1,8 @@
-package main.java.pages;
+package pages;
 
 import org.openqa.selenium.*;
 import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.*;
-
 import java.time.Duration;
 
 public abstract class BasePage {

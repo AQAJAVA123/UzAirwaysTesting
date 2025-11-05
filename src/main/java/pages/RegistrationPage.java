@@ -1,8 +1,8 @@
-package main.java.pages;
+package pages;
 
+import io.qameta.allure.Step;
 import org.openqa.selenium.*;
-import org.openqa.selenium.support.*;
-import org.openqa.selenium.support.ui.*;
+import org.openqa.selenium.support.FindBy;
 
 public class RegistrationPage extends BasePage {
 
@@ -31,30 +31,37 @@ public class RegistrationPage extends BasePage {
         super(driver);
     }
 
+    @Step("Enter email: {email}")
     public void enterEmail(String email) {
         waitUntilVisible(emailInput).sendKeys(email);
     }
 
+    @Step("Enter first name: {firstName}")
     public void enterFirstName(String firstName) {
         waitUntilVisible(firstNameInput).sendKeys(firstName);
     }
 
+    @Step("Enter last name: {lastName}")
     public void enterLastName(String lastName) {
         waitUntilVisible(lastNameInput).sendKeys(lastName);
     }
 
+    @Step("Enter birth date: {birthDate}")
     public void enterBirthDate(String birthDate) {
         waitUntilVisible(birthDateInput).sendKeys(birthDate);
     }
 
+    @Step("Enter password")
     public void enterPassword(String password) {
         waitUntilVisible(passwordInput).sendKeys(password);
     }
 
+    @Step("Confirm password")
     public void confirmPassword(String password) {
         waitUntilVisible(confirmPasswordInput).sendKeys(password);
     }
 
+    @Step("Click Register")
     public void clickRegister() {
         waitUntilClickable(registerButton).click();
     }

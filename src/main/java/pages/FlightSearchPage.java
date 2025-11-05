@@ -1,8 +1,9 @@
-package main.java.pages;
+package pages;
 
+import io.qameta.allure.Step;
 import org.openqa.selenium.*;
-import org.openqa.selenium.support.*;
-import org.openqa.selenium.support.ui.*;
+import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import java.util.List;
 
@@ -37,9 +38,6 @@ public class FlightSearchPage extends BasePage {
 
     @FindBy(css = "th.month")
     private List<WebElement> monthHeaders;
-
-    @FindBy(css = "div.dropdown-menu.show input.form-control")
-    private WebElement arrivalSearchBox;
 
     @FindBy(css = ".drp-calendar.left .next.available")
     private WebElement nextButtonLeft;
@@ -112,6 +110,7 @@ public class FlightSearchPage extends BasePage {
         return By.xpath(String.format(CURRENCY_OPTION, currency));
     }
 
+    @Step("Enable round trip mode if disabled")
     public void enableRoundTripIfDisabled() {
         waitUntilClickable(toggleLabel);
         if (oneWayToggleCheckbox.isSelected()) {
@@ -120,6 +119,7 @@ public class FlightSearchPage extends BasePage {
         }
     }
 
+    @Step("Select departure city: {cityName}")
     public void selectDepartureCity(String cityName) {
         fromButton.click();
         waitUntilVisible(cityDropdownList);
@@ -128,6 +128,7 @@ public class FlightSearchPage extends BasePage {
         city.click();
     }
 
+    @Step("Select arrival city: {cityName}")
     public void selectArrivalCity(String cityName) {
         waitUntilClickable(toButton).click();
         try {
@@ -142,6 +143,7 @@ public class FlightSearchPage extends BasePage {
         }
     }
 
+    @Step("Select departure date: {day} {targetMonth}")
     public boolean selectDepartureDate(String day, String targetMonth) {
         jsClick(departureInput);
         waitUntilVisible(calendarLeft);
@@ -162,6 +164,7 @@ public class FlightSearchPage extends BasePage {
         return false;
     }
 
+    @Step("Select return date: {day}")
     public void selectReturnDate(String day) {
         jsClick(waitUntilReturnInputVisible());
         waitUntilVisible(calendarRight);
@@ -170,6 +173,7 @@ public class FlightSearchPage extends BasePage {
         dateCell.click();
     }
 
+    @Step("Select passengers: {adults} adults, {children} children, {babies} babies")
     public void selectPassengers(int adults, int children, int babies) {
         waitUntilClickable(passengersButton);
         scrollIntoView(passengersButton);
@@ -179,11 +183,9 @@ public class FlightSearchPage extends BasePage {
         for (int i = getCurrentValue(adultInput); i < adults; i++) {
             adultPlusButton.click();
         }
-
         for (int i = getCurrentValue(childInput); i < children; i++) {
             childPlusButton.click();
         }
-
         for (int i = getCurrentValue(babyInput); i < babies; i++) {
             babyPlusButton.click();
         }
@@ -191,6 +193,7 @@ public class FlightSearchPage extends BasePage {
         waitUntilClickable(applyPassengersButton).click();
     }
 
+    @Step("Select currency: {currencyCode}")
     public void selectCurrency(String currencyCode) {
         waitUntilClickable(currencyDropdown);
         jsClick(currencyDropdown);
@@ -225,6 +228,7 @@ public class FlightSearchPage extends BasePage {
         return waitUntilVisible(returnInput);
     }
 
+    @Step("Click search button")
     public void clickSearch() {
         wait.until(ExpectedConditions.elementToBeClickable(searchButton)).click();
     }

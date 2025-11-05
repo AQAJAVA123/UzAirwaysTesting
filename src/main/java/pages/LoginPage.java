@@ -1,10 +1,8 @@
-package main.java.pages;
+package pages;
 
+import io.qameta.allure.Step;
 import org.openqa.selenium.*;
-import org.openqa.selenium.support.*;
-import org.openqa.selenium.support.ui.*;
-
-import java.time.Duration;
+import org.openqa.selenium.support.FindBy;
 
 public class LoginPage extends BasePage {
 
@@ -24,29 +22,34 @@ public class LoginPage extends BasePage {
         super(driver);
     }
 
+    @Step("Enter email: {email}")
     public void enterEmail(String email) {
         waitUntilVisible(emailField).clear();
         emailField.sendKeys(email);
     }
 
+    @Step("Enter password")
     public void enterPassword(String password) {
         waitUntilVisible(passwordField).clear();
         passwordField.sendKeys(password);
     }
 
+    @Step("Click Login button")
+    public void clickLogin() {
+        waitUntilClickable(loginButton).click();
+    }
+
+    @Step("Is Login button visible?")
     public boolean isLoginButtonVisible() {
         return isElementVisible(loginButton);
     }
 
+    @Step("Is login error toast visible?")
     public boolean isLoginErrorVisible() {
         try {
             return waitUntilVisible(loginErrorToast).isDisplayed();
         } catch (TimeoutException e) {
             return false;
         }
-    }
-
-    public void clickLogin() {
-        waitUntilClickable(loginButton).click();
     }
 }

@@ -1,9 +1,10 @@
-package main.java.pages;
+package pages;
 
+import io.qameta.allure.Step;
 import org.openqa.selenium.*;
-import org.openqa.selenium.support.*;
+import org.openqa.selenium.support.FindBy;
 
-public class MainPage extends BasePage {
+public class MainPage extends pages.BasePage {
 
     @FindBy(id = "cookieyes")
     private WebElement acceptCookiesBtn;
@@ -12,6 +13,7 @@ public class MainPage extends BasePage {
         super(driver);
     }
 
+    @Step("Accept cookies if banner is present")
     public void acceptCookiesIfPresent() {
         if (isElementVisible(acceptCookiesBtn)) {
             waitUntilClickable(acceptCookiesBtn).click();
