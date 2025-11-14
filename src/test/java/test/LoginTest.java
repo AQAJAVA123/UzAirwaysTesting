@@ -1,17 +1,18 @@
 package test;
 
+import io.qameta.allure.Step;
 import org.testng.annotations.*;
 import pages.LoginPage;
 
 import static org.testng.Assert.assertTrue;
 
-public class LoginTest extends BaseTest{
+public class LoginTest extends BaseTest {
     private LoginPage loginPage;
 
     private final String testEmail = "testuser@example.com";
     private final String testPassword = "Password123";
 
-    @BeforeClass
+    @BeforeMethod
     public void setup() {
         driver.get(AUTH_URL + "/auth/login?redirect=/orders?lang=en");
         loginPage = new LoginPage(driver);

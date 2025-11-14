@@ -1,21 +1,24 @@
 package test;
 
+import io.qameta.allure.*;
 import org.testng.annotations.*;
 import pages.MainPage;
 import pages.FlightSearchPage;
 
 import static org.testng.Assert.assertTrue;
 
+@Epic("Flight search")
+@Feature("Validation")
 public class SameCitySearchTest extends BaseTest {
     private MainPage mainPage;
     private FlightSearchPage flightSearchPage;
 
     private final String cityName = "Tashkent";
     private final String departureDay = "10";
-    private final String departureMonth = "August 2025";
+    private final String departureMonth = "December 2025";
     private final String currency = "USD";
 
-    @BeforeClass
+    @BeforeMethod
     public void initPages() {
         driver.get(BASE_URL);
         mainPage = new MainPage(driver);
@@ -23,6 +26,9 @@ public class SameCitySearchTest extends BaseTest {
     }
 
     @Test
+    @Story("City validation")
+    @Description("Verify that the system shows validation error when departure and arrival cities are the same")
+    @Severity(SeverityLevel.NORMAL)
     public void testSameCitySearchError() {
         mainPage.acceptCookiesIfPresent();
 

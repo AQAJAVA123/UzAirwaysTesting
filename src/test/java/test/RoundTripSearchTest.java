@@ -1,11 +1,14 @@
 package test;
 
+import io.qameta.allure.*;
 import org.testng.annotations.*;
 import pages.MainPage;
 import pages.FlightSearchPage;
 
 import static org.testng.Assert.assertTrue;
 
+@Epic("Flight search")
+@Feature("Round-trip flight search")
 public class RoundTripSearchTest extends BaseTest {
     private MainPage mainPage;
     private FlightSearchPage flightSearchPage;
@@ -13,14 +16,14 @@ public class RoundTripSearchTest extends BaseTest {
     private final String departureCity = "Tashkent";
     private final String arrivalCity = "Istanbul";
     private final String departureDay = "10";
-    private final String departureMonth = "August 2025";
+    private final String departureMonth = "December 2025";
     private final String returnDay = "20";
     private final int adults = 1;
     private final int children = 0;
     private final int babies = 0;
     private final String currency = "USD";
 
-    @BeforeClass
+    @BeforeMethod
     public void initPages() {
         driver.get(BASE_URL);
         mainPage = new MainPage(driver);
@@ -28,6 +31,9 @@ public class RoundTripSearchTest extends BaseTest {
     }
 
     @Test
+    @Story("Valid round-trip search scenario")
+    @Description("Verify that a user can search for a round-trip flight and reach booking page")
+    @Severity(SeverityLevel.CRITICAL)
     public void testRoundTripSearch() {
         mainPage.acceptCookiesIfPresent();
 
