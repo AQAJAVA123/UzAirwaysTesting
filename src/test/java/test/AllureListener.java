@@ -11,9 +11,9 @@ public class AllureListener implements ITestListener {
         if (instance instanceof BaseTest) {
             BaseTest base = (BaseTest) instance;
             if (base.driver != null) {
-                AllureUtils.takeScreenshot(base.driver);
-                AllureUtils.attachPageSource(base.driver);
-                AllureUtils.attachConsoleLogs(base.driver);
+                AllureUtils.takeScreenshot();
+                AllureUtils.attachPageSource();
+                AllureUtils.attachConsoleLogs();
             }
         }
     }

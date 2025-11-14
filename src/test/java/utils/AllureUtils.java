@@ -4,6 +4,7 @@ import io.qameta.allure.Attachment;
 import org.openqa.selenium.*;
 import org.openqa.selenium.logging.LogEntry;
 import org.openqa.selenium.logging.LogType;
+import test.BaseTest;
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -12,7 +13,8 @@ import java.util.stream.Collectors;
 public class AllureUtils {
 
     @Attachment(value = "Screenshot", type = "image/png")
-    public static byte[] takeScreenshot(WebDriver driver) {
+    public static byte[] takeScreenshot() {
+        WebDriver driver = BaseTest.getDriver();
         try {
             return ((TakesScreenshot) driver).getScreenshotAs(OutputType.BYTES);
         } catch (Exception ignored) {
@@ -21,7 +23,8 @@ public class AllureUtils {
     }
 
     @Attachment(value = "Page Source", type = "text/html", fileExtension = ".html")
-    public static byte[] attachPageSource(WebDriver driver) {
+    public static byte[] attachPageSource() {
+        WebDriver driver = BaseTest.getDriver();
         try {
             return driver.getPageSource().getBytes(StandardCharsets.UTF_8);
         } catch (Exception ignored) {
@@ -30,7 +33,8 @@ public class AllureUtils {
     }
 
     @Attachment(value = "Browser Console Logs", type = "text/plain")
-    public static String attachConsoleLogs(WebDriver driver) {
+    public static String attachConsoleLogs() {
+        WebDriver driver = BaseTest.getDriver();
         try {
             List<LogEntry> entries = driver.manage().logs().get(LogType.BROWSER).getAll();
             if (entries == null || entries.isEmpty()) {

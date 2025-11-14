@@ -13,9 +13,13 @@ import java.io.IOException;
 import java.util.Properties;
 
 public abstract class BaseTest {
-    protected WebDriver driver;
+    protected static WebDriver driver;
     protected static final String BASE_URL = "https://uzairways.com/en";
     protected static final String AUTH_URL = "https://percab.uzairways.com";
+
+    public static WebDriver getDriver() {
+        return driver;
+    }
 
     @BeforeMethod
     public void setUp() {
@@ -33,14 +37,14 @@ public abstract class BaseTest {
         try {
             Capabilities caps = ((RemoteWebDriver) driver).getCapabilities();
 
-        Properties props = new Properties();
-        props.setProperty("Browser", caps.getBrowserName() + " " + caps.getBrowserVersion());
-        props.setProperty("OS", System.getProperty("os.name"));
-        FileOutputStream fos = new FileOutputStream("target/allure-results/environment.properties");
-        props.store(fos, "Allure Environment Properties");
-        fos.close();
-    } catch (
-    IOException e) {
+            Properties props = new Properties();
+            props.setProperty("Browser", caps.getBrowserName() + " " + caps.getBrowserVersion());
+            props.setProperty("OS", System.getProperty("os.name"));
+
+            FileOutputStream fos = new FileOutputStream("target/allure-results/environment.properties");
+            props.store(fos, "Allure Environment Properties");
+            fos.close();
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
